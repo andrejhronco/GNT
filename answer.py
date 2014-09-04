@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import os, sys
 import random
 
 print "Content-Type: text/html"
@@ -38,6 +38,7 @@ print "Your answer was: {0}\nthis is {1}".format(note, answer)
 
 print "</div>"
 
+print dict(os.environ)
 
 print """
     </body>

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import os
+import sys
 import random
 
 print "Content-Type: text/html"
@@ -43,7 +44,7 @@ print """
 print"""
 <h3>Select which note just played and click the submit button.</h3>
 
-<form action="answer.py" method="POST">
+<form action="" method="POST">
 	<input type="hidden" name="answer" value="{0}">
 	<label for="ding">Ding</label>
   	<input type="radio" name="note" id="ding" value="ding"><br>
@@ -60,6 +61,8 @@ print"""
 
 print "</div>"
 
+print os.getenv("QUERY_STRING")
+#sys.stdin.read()
 
 print """
     </body>
