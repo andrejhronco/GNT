@@ -24,7 +24,7 @@ print """
     </head>
     <body>
 """
-notes = ['calung-1', 'calung-2', 'calung-3', 'calung-4', 'calung-5']
+notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 
 note = random.choice(notes)
 
