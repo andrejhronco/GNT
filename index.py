@@ -24,7 +24,7 @@ print """
     </head>
     <body>
 """
-notes = ['calung-1', 'calung-2', 'calung-3', 'calung-4', 'calung-5']
+notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 
 note = random.choice(notes)
 
@@ -44,6 +44,7 @@ print"""
 <h3>Select which note just played and click the submit button.</h3>
 
 <form action="answer.py" method="POST">
+	<input type="hidden" name="answer" value="{0}">
 	<label for="ding">Ding</label>
   	<input type="radio" name="note" id="ding" value="ding"><br>
 	<label for="dong">Dong</label>
@@ -55,8 +56,8 @@ print"""
 	<label for="dang">Dang</label>
   	<input type="radio" name="note" id="dang" value="dang"><br>
   	<input type="submit" value='Submit Answer'>
-</form>
-"""
+</form>""".format(note)
+
 print "</div>"
 
 

@@ -1,2 +1,0 @@
-#! /bin/bash
-rsync -Cavz --delete -e "ssh -p 2222" --exclude='*.pyc' --exclude='*.db' --exclude='*.json' --exclude='*.zip' . aue@aue.org:/home2/aue/public_html/aueorg/gamaweb
