@@ -49,6 +49,7 @@ print"""
 <h3>Select which note just played and click the submit button.</h3>
 
 <form action="" method="POST">
+  <input type="hidden" name="org" value="gsj">
   <input type="hidden" name="answer" value="{0}">
   """.format(note)
 
@@ -66,21 +67,32 @@ def print_list_html(l):
     print cgi.escape(s)
     print '<br>'
 
-#print "Content Length:", os.getenv("CONTENT_LENGTH")
+def all_same(items):
+    return all(x == items[0] for x in items)
+
 cl = os.getenv("CONTENT_LENGTH")
 if cl:
   data = sys.stdin.read(int(cl))
   parts = data.split("&")
-
+  #print "parts: " + parts
   t = []
   for bits in parts:
+    #print "bits (pre): " + bits + "<br>"
     kv = bits.split("=")
-    t.append(kv[1])
+    #print "kv[0]: " + kv[0] + "<br>"
+    if kv[0] in ('answer', 'note'):
+      #print "bits (true): " + bits + "<br>"
+      t.append(kv[1])
+    else:
+      pass
+      #print "bits (false): " + bits + "<br>"
+
+  #print "t: ", t
   if len(t) > 1:
-    if t[0] == t[1]:
+    if all_same(t):
       print "Correct!"
     else:
-      print "Wrong"
+      print "Incorrect, Try again."
   else:
     print "Please select an answer."
 
