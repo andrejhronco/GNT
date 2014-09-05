@@ -54,7 +54,7 @@ print"""
 
 for n in notes:
   print '''<label for="{0}">{1}</label>
-  <input type="radio" name="{0}" id="{0}" value="{0}"><br>'''.format(n, n.capitalize())
+  <input type="radio" name="note" id="{0}" value="{0}"><br>'''.format(n, n.capitalize())
 
 print """<input type="submit" value='Submit Answer'>
 </form>""".format(note)
