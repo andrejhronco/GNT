@@ -90,8 +90,11 @@ if cl:
       print "Incorrect, Try again."
   else:
     print "Please select an answer."
-
+    
   print '<br><a href="/index.py">Try Again!</a>'
+
+  print 'Organization name is:'
+  
 
 print """
     </body>
