@@ -76,11 +76,13 @@ if cl:
   for bits in parts:
     kv = bits.split("=")
     t.append(kv[1])
-
-  if t[0] == t[1]:
-    print "Correct!"
+  if len(t) > 1:
+    if t[0] == t[1]:
+      print "Correct!"
+    else:
+      print "Wrong"
   else:
-    print "Wrong"
+    print "Please select an answer."
 
   print '<br><a href="/index.py">Try Again!</a>'
 
