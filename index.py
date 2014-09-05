@@ -74,20 +74,15 @@ cl = os.getenv("CONTENT_LENGTH")
 if cl:
   data = sys.stdin.read(int(cl))
   parts = data.split("&")
-  #print "parts: " + parts
   t = []
+  
   for bits in parts:
-    #print "bits (pre): " + bits + "<br>"
     kv = bits.split("=")
-    #print "kv[0]: " + kv[0] + "<br>"
     if kv[0] in ('answer', 'note'):
-      #print "bits (true): " + bits + "<br>"
       t.append(kv[1])
     else:
       pass
-      #print "bits (false): " + bits + "<br>"
 
-  #print "t: ", t
   if len(t) > 1:
     if all_same(t):
       print "Correct!"
