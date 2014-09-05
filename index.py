@@ -50,7 +50,8 @@ print"""
 
 <form action="" method="POST">
   <input type="hidden" name="answer" value="{0}">
-  """
+  """.format(note)
+
 for n in notes:
   print '''<label for="{0}">{1}</label>
   <input type="radio" name="{0}" id="{0}" value="{0}"><br>'''.format(n, n.capitalize())
@@ -71,10 +72,17 @@ if cl:
   data = sys.stdin.read(int(cl))
   parts = data.split("&")
 
+  t = []
   for bits in parts:
     kv = bits.split("=")
-    print "value: " + kv[1] + "<br>"
+    t.append(kv[1])
 
+  if t[0] == t[1]:
+    print "Correct!"
+  else:
+    print "Wrong"
+
+  print '\n<a href="/index.py">Try Again!</a>'
 
 print """
     </body>
