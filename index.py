@@ -82,7 +82,7 @@ if cl:
   else:
     print "Wrong"
 
-  print '\n<a href="/index.py">Try Again!</a>'
+  print '<br><a href="/index.py">Try Again!</a>'
 
 print """
     </body>
