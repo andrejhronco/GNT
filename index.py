@@ -88,21 +88,26 @@ if cl:
   #a = {} # temp for answer compare
   a = [] # temp for answer compare
   o = {} # holds other key/values
+  # answers = [] # holds answers for the session
   for k, v in dic.items():
     if k in ('answer', 'note'):
       a.append(v)
       # a[k] = v
     else:
       o[k] = v
-
+  
   if len(a) > 1:
+    
     if all_same(a):
+      # answers.append(1)
       print "Correct!"
     else:
+      # answers.append(0)
       print "Incorrect, Try again."
   else:
     print "Please select an answer."
     
+  # print answers, len(answers)
   print '<br><a href="/index.py">Again!</a><br>'
   print "-" * 35, "dic: ", dic, " ----- ", "o: ", o
   print '<br>Organization name is:', o.get('org').upper() 
