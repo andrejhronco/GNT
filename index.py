@@ -50,6 +50,7 @@ print"""
 
 <form action="" method="POST">
   <input type="hidden" name="org" value="gsj">
+  <input type="hidden" name="user" value="andrej">
   <input type="hidden" name="answer" value="{0}">
   """.format(note)
 
@@ -68,32 +69,45 @@ def print_list_html(l):
     print '<br>'
 
 def all_same(items):
-    return all(x == items[0] for x in items)
+  return all(x == items[0] for x in items)
+
+# def all_same(dic):
+
+#   for k, v in dic.items():
+
 
 cl = os.getenv("CONTENT_LENGTH")
 if cl:
   data = sys.stdin.read(int(cl))
-  parts = data.split("&")
-  t = []
-  
-  for bits in parts:
-    kv = bits.split("=")
-    if kv[0] in ('answer', 'note'):
-      t.append(kv[1])
-    else:
-      pass
 
-  if len(t) > 1:
-    if all_same(t):
+  dic = {}
+  for kv in data.split('&'):
+    k, v = kv.split('=')
+    dic[k] = v
+
+  #print dic
+  #a = {} # temp for answer compare
+  a = [] # temp for answer compare
+  o = {} # holds other key/values
+  for k, v in dic.items():
+    if k in ('answer', 'note'):
+      a.append(v)
+      # a[k] = v
+    else:
+      o[k] = v
+
+  if len(a) > 1:
+    if all_same(a):
       print "Correct!"
     else:
       print "Incorrect, Try again."
   else:
     print "Please select an answer."
     
-  print '<br><a href="/index.py">Try Again!</a>'
-
-  print 'Organization name is:' # put this comment back
+  print '<br><a href="/index.py">Again!</a><br>'
+  print "-" * 35, o
+  print '<br>Organization name is:', o.get('org').upper() 
+  print '<br>User name is:', o.get('user').capitalize() 
   
 
 print """
