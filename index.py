@@ -72,7 +72,6 @@ def all_same(items):
   return all(x == items[0] for x in items)
 
 # def all_same(dic):
-
 #   for k, v in dic.items():
 
 
@@ -105,7 +104,7 @@ if cl:
     print "Please select an answer."
     
   print '<br><a href="/index.py">Again!</a><br>'
-  print "-" * 35, o
+  print "-" * 35, "dic: ", dic, " ----- ", "o: ", o
   print '<br>Organization name is:', o.get('org').upper() 
   print '<br>User name is:', o.get('user').capitalize() 
   
