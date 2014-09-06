@@ -93,7 +93,7 @@ if cl:
     
   print '<br><a href="/index.py">Try Again!</a>'
 
-  print 'Organization name is:'
+  print 'Organization name is:' # put this comment back
   
 
 print """
