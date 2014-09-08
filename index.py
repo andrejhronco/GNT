@@ -78,7 +78,6 @@ if cl:
     dic[k] = v
 
   if dic.get('note'):
-
     if dic['answer'] == dic['note']:
       print "Correct!"
     else:
@@ -91,7 +90,6 @@ if cl:
   print '<br>Organization name is:', dic.get('org').upper() 
   print '<br>User name is:', dic.get('user').capitalize() 
   
-
 print """
     </body>
 </html>
