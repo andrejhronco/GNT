@@ -72,13 +72,13 @@ cl = os.getenv("CONTENT_LENGTH")
 if cl:
   data = sys.stdin.read(int(cl))
 
-  dic = {}
+  d = {}
   for kv in data.split('&'):
     k, v = kv.split('=')
-    dic[k] = v
+    d[k] = v
 
-  if dic.get('note'):
-    if dic['answer'] == dic['note']:
+  if d.get('note'):
+    if d['answer'] == d['note']:
       print "Correct!"
     else:
       print "Incorrect, Try again."
@@ -87,8 +87,8 @@ if cl:
     
   print '<br><a href="/index.py">Again!</a><br>'
   #print "-" * 35, "dic: ", dic, " ----- "
-  print '<br>Organization name is:', dic.get('org').upper() 
-  print '<br>User name is:', dic.get('user').capitalize() 
+  print '<br>Organization name is:', d.get('org').upper() 
+  print '<br>User name is:', d.get('user').capitalize() 
   
 print """
     </body>
