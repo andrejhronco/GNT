@@ -77,7 +77,7 @@ if cl:
     k, v = kv.split('=')
     d[k] = v
 
-  if d.get('note'):
+  if 'note' in d and d['note']:
     if d['answer'] == d['note']:
       print "Correct!"
     else:
