@@ -8,6 +8,24 @@ import cgi
 import cgitb
 cgitb.enable()
 
+def web_input():
+  c = os.getenv("CONTENT_LENGTH")
+  if c:
+    data = sys.stdin.read(int(c))
+    d = {}
+
+    for kv in data.split('&'):
+      k, v = kv.split('=')
+      d[k] = v
+
+    return d
+  else:
+    return {}
+
+
+notes = ['ding', 'dong', 'deng', 'dung', 'dang']
+note = random.choice(notes)
+
 print "Content-Type: text/html"
 print
 print """<!DOCTYPE html>
@@ -29,19 +47,15 @@ print """<!DOCTYPE html>
     </head>
     <body>
 """
-notes = ['ding', 'dong', 'deng', 'dung', 'dang']
-
-note = random.choice(notes)
-
 
 print "<div id='container'>"
 
 #  audio player
 print """
-<audio src="audio/{0}.mp3" controls autoplay loop>
+<audio src="audio/{0}.mp3" controls loop> # autoplay - removed for now for silence...hah
   <source src="audio/{0}.mp3" type="audio/mp3">
   <source src="audio/{0}.ogg" type="audio/ogg">
-<p>Your browser does not support the audio element </p>
+<p>Your browser does not support the audio element.</p>
 </audio>""".format(note)
 
 #  form
@@ -55,40 +69,33 @@ print"""
   """.format(note)
 
 for n in notes:
-  print '''<label for="{0}">{1}</label>
-  <input type="radio" name="note" id="{0}" value="{0}"><br>'''.format(n, n.capitalize())
+  print """<label for="{0}">{1}</label>
+  <input type="radio" name="note" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
 
 print """<input type="submit" value='Submit Answer'>
 </form>""".format(note)
 
 print "</div>"
 
-def print_list_html(l):
-  for s in l:
-    print cgi.escape(s)
-    print '<br>'
-
-cl = os.getenv("CONTENT_LENGTH")
-if cl:
-  data = sys.stdin.read(int(cl))
-
-  d = {}
-  for kv in data.split('&'):
-    k, v = kv.split('=')
-    d[k] = v
-
-  if 'note' in d and d['note']:
+# test
+d = web_input()
+print d
+if d.get('note'):
     if d['answer'] == d['note']:
-      print "Correct!"
+        print "Correct!", d['answer']
     else:
-      print "Incorrect, Try again."
-  else:
+        print "Incorrect, Try again.", d['answer']
+        note = d['answer']
+else:
     print "Please select an answer."
-    
-  print '<br><a href="/index.py">Again!</a><br>'
-  #print "-" * 35, "dic: ", dic, " ----- "
-  print '<br>Organization name is:', d.get('org').upper() 
-  print '<br>User name is:', d.get('user').capitalize() 
+
+print '<br><a href="/index.py">Again!</a><br>'
+
+if 'org' in d:
+  print '<p>Organization name is:', d.get('org','').upper() + "</p>"
+
+if 'user' in d:
+  print '<p>User name is:', d.get('user','').capitalize() + "</p>"
   
 print """
     </body>
