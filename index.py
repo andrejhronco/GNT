@@ -18,19 +18,27 @@ def sattoloCycle(items):
     return
 
 
+def rand(array):
+    a = array[:]
+    for i in xrange(len(a) - 1):
+        j = random.randint(i + 1, len(a) - 1)
+        a[i], a[j] = a[j], a[i]
+    return a
+
+
 def web_input():
-  c = os.getenv("CONTENT_LENGTH")
-  if c:
-    data = sys.stdin.read(int(c))
-    d = {}
+    c = os.getenv("CONTENT_LENGTH")
+    if c:
+        data = sys.stdin.read(int(c))
+        d = {}
 
-    for kv in data.split('&'):
-      k, v = kv.split('=')
-      d[k] = v
+        for kv in data.split('&'):
+            k, v = kv.split('=')
+            d[k] = v
 
-    return d
-  else:
-    return {}
+        return d
+    else:
+        return {}
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 wrong = False
@@ -69,12 +77,13 @@ print """<!DOCTYPE html>
     </head>
     <body>
 """
-sattoloCycle(notes)
-print "notes: ", notes
+
 print "<div id='container'>"
 
 if not wrong:
+    notes = rand(notes)
     note = random.choice(notes)
+    print note
 else: 
     note = d['answer']
 
