@@ -4,9 +4,19 @@
 import os
 import sys
 import random
+from random import randrange
 import cgi
 import cgitb
 cgitb.enable()
+
+def sattoloCycle(items):
+    i = len(items)
+    while i > 1:
+        i = i - 1
+        j = randrange(i)  # 0 <= j <= i-1
+        items[j], items[i] = items[i], items[j]
+    return
+
 
 def web_input():
   c = os.getenv("CONTENT_LENGTH")
@@ -84,7 +94,8 @@ print"""
   <input type="hidden" name="user" value="andrej">
   <input type="hidden" name="answer" value="{0}">
   """.format(note)
-
+  
+sattoloCycle(notes)
 for n in notes:
   print """<label for="{0}">{1}</label>
   <input type="radio" name="note" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
