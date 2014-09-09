@@ -69,7 +69,8 @@ print """<!DOCTYPE html>
     </head>
     <body>
 """
-
+sattoloCycle(notes)
+print "notes: ", notes
 print "<div id='container'>"
 
 if not wrong:
@@ -94,8 +95,7 @@ print"""
   <input type="hidden" name="user" value="andrej">
   <input type="hidden" name="answer" value="{0}">
   """.format(note)
-  
-sattoloCycle(notes)
+
 for n in notes:
   print """<label for="{0}">{1}</label>
   <input type="radio" name="note" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
