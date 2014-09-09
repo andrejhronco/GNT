@@ -22,9 +22,21 @@ def web_input():
   else:
     return {}
 
-
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
-note = random.choice(notes)
+wrong = False
+notsubmitted = ""
+result = ""
+d = web_input()
+
+if d.get('note'):
+    if d['answer'] == d['note']:
+        result = "Correct!"
+        wrong = False
+    else:
+        result = "Incorrect, Try again."
+        wrong = True
+else:
+    notsubmitted = "Please select an answer."
 
 print "Content-Type: text/html"
 print
@@ -50,9 +62,14 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 
+if not wrong:
+    note = random.choice(notes)
+else: 
+    note = d['answer']
+
 #  audio player
 print """
-<audio src="audio/{0}.mp3" controls loop> # autoplay - removed for now for silence...hah
+<audio src="audio/{0}.mp3" autoplay controls loop> # autoplay - removed for now for silence...hah
   <source src="audio/{0}.mp3" type="audio/mp3">
   <source src="audio/{0}.ogg" type="audio/ogg">
 <p>Your browser does not support the audio element.</p>
@@ -77,19 +94,8 @@ print """<input type="submit" value='Submit Answer'>
 
 print "</div>"
 
-# test
-d = web_input()
-print d
-if d.get('note'):
-    if d['answer'] == d['note']:
-        print "Correct!", d['answer']
-    else:
-        print "Incorrect, Try again.", d['answer']
-        note = d['answer']
-else:
-    print "Please select an answer."
-
-print '<br><a href="/index.py">Again!</a><br>'
+print "<p><strong>" + result + "</strong></p>"
+print "<p>" + notsubmitted + "</p>"
 
 if 'org' in d:
   print '<p>Organization name is:', d.get('org','').upper() + "</p>"
