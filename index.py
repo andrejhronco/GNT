@@ -99,13 +99,13 @@ print "</div>"
 
 if not first: # we only print a status on form submission
     if not choice_made:
-        result = "Please select an answer"
+        message = "Please select an answer"
     elif wrong:
-        result = "Incorrect, try again"
+        message = "Incorrect, try again"
     else:
-        result = "Correct"
+        message = "Correct"
 
-    print "<p><strong>{}</strong></p>".format(result)
+    print "<p><strong>{}</strong></p>".format(message)
 
     if 'org' in d:
         print '<p>Organization name is:', d.get('org','').upper() + "</p>"
