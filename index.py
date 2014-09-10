@@ -5,18 +5,8 @@ import os
 import sys
 import random
 from random import randrange
-import cgi
 import cgitb
 cgitb.enable()
-
-def sattoloCycle(items):
-    i = len(items)
-    while i > 1:
-        i = i - 1
-        j = randrange(i)  # 0 <= j <= i-1
-        items[j], items[i] = items[i], items[j]
-    return
-
 
 def rand(array):
     a = array[:]
@@ -41,20 +31,10 @@ def web_input():
         return {}
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
-wrong = False
-notsubmitted = ""
-result = ""
 d = web_input()
-
-if d.get('note'):
-    if d['answer'] == d['note']:
-        result = "Correct!"
-        wrong = False
-    else:
-        result = "Incorrect, Try again."
-        wrong = True
-else:
-    notsubmitted = "Please select an answer."
+first = not any(d)  # POST calls should have some input vars so must be GET
+choice_made = d.get('choice')  # 'note' will be missing if no radio button pressed
+wrong = choice_made and d['note'] != d['choice']  # test user selection against stored correct answer
 
 print "Content-Type: text/html"
 print
@@ -80,19 +60,20 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 
-if not wrong:
-    notes = rand(notes)
-    note = random.choice(notes)
-    print note
-else: 
-    note = d['answer']
+if wrong:
+    note = d['note']
+else:
+    temp_notes = list(notes)
+    if not first:
+        temp_notes.remove(d['note'])
+    note = random.choice(temp_notes)
 
 #  audio player
 print """
 <audio src="audio/{0}.mp3" autoplay controls loop> # autoplay - removed for now for silence...hah
   <source src="audio/{0}.mp3" type="audio/mp3">
   <source src="audio/{0}.ogg" type="audio/ogg">
-<p>Your browser does not support the audio element.</p>
+  <p>Your browser does not support the audio element.</p>
 </audio>""".format(note)
 
 #  form
@@ -102,26 +83,35 @@ print"""
 <form action="" method="POST">
   <input type="hidden" name="org" value="gsj">
   <input type="hidden" name="user" value="andrej">
-  <input type="hidden" name="answer" value="{0}">
+  <input type="hidden" name="note" value="{0}">
   """.format(note)
 
+# notes = rand(notes) # maybe later, changes the order of inputs so you don't get used to an answer pattern
 for n in notes:
-  print """<label for="{0}">{1}</label>
-  <input type="radio" name="note" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
+    print """<label for="{0}">{1}</label>
+    <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
 
 print """<input type="submit" value='Submit Answer'>
 </form>""".format(note)
 
 print "</div>"
 
-print "<p><strong>" + result + "</strong></p>"
-print "<p>" + notsubmitted + "</p>"
 
-if 'org' in d:
-  print '<p>Organization name is:', d.get('org','').upper() + "</p>"
+if not first: # we only print a status on form submission
+    if not choice_made:
+        result = "Please select an answer"
+    elif wrong:
+        result = "Incorrect, try again"
+    else:
+        result = "Correct"
 
-if 'user' in d:
-  print '<p>User name is:', d.get('user','').capitalize() + "</p>"
+    print "<p><strong>{}</strong></p>".format(result)
+
+    if 'org' in d:
+        print '<p>Organization name is:', d.get('org','').upper() + "</p>"
+
+    if 'user' in d:
+        print '<p>User name is:', d.get('user','').capitalize() + "</p>"
   
 print """
     </body>
