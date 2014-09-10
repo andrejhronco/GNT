@@ -81,9 +81,11 @@ print"""
 <h3>Select which note just played and click the submit button.</h3>
 
 <form action="" method="POST">
-  <input type="hidden" name="org" value="gsj">
-  <input type="hidden" name="user" value="andrej">
   <input type="hidden" name="note" value="{0}">
+  <label for="user">User</label>
+  <input type="text" name="user" value="">
+  <label for="org">Organization</label>
+  <input type="text" name="org" value=""><br><br>
   """.format(note)
 
 # notes = rand(notes) # maybe later, changes the order of inputs so you don't get used to an answer pattern
@@ -91,11 +93,10 @@ for n in notes:
     print """<label for="{0}">{1}</label>
     <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
 
-print """<input type="submit" value='Submit Answer'>
+print """<br><input type="submit" value='Submit Answer'>
 </form>""".format(note)
 
 print "</div>"
-
 
 if not first: # we only print a status on form submission
     if not choice_made:
@@ -108,10 +109,10 @@ if not first: # we only print a status on form submission
     print "<p><strong>{}</strong></p>".format(message)
 
     if 'org' in d:
-        print '<p>Organization name is:', d.get('org','').upper() + "</p>"
+        print '<p>Organization name is:', d.get('org','Guest').upper() + "</p>"
 
     if 'user' in d:
-        print '<p>User name is:', d.get('user','').capitalize() + "</p>"
+        print '<p>Username is:', d.get('user','Guest').capitalize() + "</p>"
   
 print """
     </body>
