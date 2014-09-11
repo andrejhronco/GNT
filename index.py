@@ -32,8 +32,8 @@ def web_input():
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 d = web_input()
-first = not any(d)  # POST calls should have some input vars so must be GET
-choice_made = d.get('choice')  # 'note' will be missing if no radio button pressed
+first = not d  # POST calls should have some input vars so must be GET
+choice_made = bool(d.get('choice'))  # 'choice' will be missing if no radio button was pressed
 wrong = choice_made and d['note'] != d['choice']  # test user selection against stored correct answer
 
 print "Content-Type: text/html"
