@@ -6,6 +6,7 @@ import sys
 import random
 from random import randrange
 import cgitb
+import json
 cgitb.enable()
 
 def rand(array):
@@ -25,10 +26,21 @@ def web_input():
         for kv in data.split('&'):
             k, v = kv.split('=')
             d[k] = v
-
         return d
     else:
         return {}
+
+
+def save_data(data):
+    with open('session/data.json', 'wb') as f:
+        json.dump(data, f)
+
+
+def read_data():
+    with open('session/data.json') as f:
+        session = json.load(f)
+        return session
+
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 d = web_input()
@@ -113,6 +125,9 @@ if not first: # we only print a status on form submission
 
     if 'user' in d:
         print '<p>Username is:', d.get('user','Guest').capitalize() + "</p>"
+
+    save_data(d)
+    print read_data()
   
 print """
     </body>
