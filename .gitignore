@@ -55,3 +55,6 @@ docs/_build/
 # Floobits
 .floo
 .flooignore
+
+# Session Data
+session/
