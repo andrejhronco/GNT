@@ -22,11 +22,19 @@ def web_input():
     if c:
         data = sys.stdin.read(int(c))
         d = {}
+        jd = {}
 
         for kv in data.split('&'):
             k, v = kv.split('=')
-            d[k] = v
-        return d
+            if k == 'user':
+                uv = v
+            else:
+                d[k] = v
+            # {'andrej': ['note': '', 'choice': '', 'score': ['correct': n, 'incorrect': n]]}
+            # 'score' will be added outside of this function
+        jd[uv] = d
+        return jd
+        # return (jd, uv)
     else:
         return {}
 
@@ -44,9 +52,12 @@ def read_data():
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 d = web_input()
+# need to get tuple back from web_input() and assign to d and u (u = current user)
+# d = du[0]
+# u = du[1]
 first = not d  # POST calls should have some input vars so must be GET
-choice_made = bool(d.get('choice'))  # 'choice' will be missing if no radio button was pressed
-wrong = choice_made and d['note'] != d['choice']  # test user selection against stored correct answer
+choice_made = bool(d['andrej'].get('choice'))  # 'choice' will be missing if no radio button was pressed
+wrong = choice_made and d['andrej']['note'] != d['andrej']['choice']  # test user selection against stored correct answer
 
 print "Content-Type: text/html"
 print
@@ -71,13 +82,15 @@ print """<!DOCTYPE html>
 """
 
 print "<div id='container'>"
+# print read_data()
+print d
 
 if wrong:
-    note = d['note']
+    note = d['andrej']['note']
 else:
     temp_notes = list(notes)
     if not first:
-        temp_notes.remove(d['note'])
+        temp_notes.remove(d['andrej']['note'])
     note = random.choice(temp_notes)
 
 #  audio player
@@ -93,11 +106,9 @@ print"""
 <h3>Select which note just played and click the submit button.</h3>
 
 <form action="" method="POST">
-  <input type="hidden" name="note" value="{0}">
   <label for="user">User</label>
   <input type="text" name="user" value="">
-  <label for="org">Organization</label>
-  <input type="text" name="org" value=""><br><br>
+  <input type="hidden" name="note" value="{0}"><br><br>
   """.format(note)
 
 # notes = rand(notes) # maybe later, changes the order of inputs so you don't get used to an answer pattern
@@ -120,14 +131,11 @@ if not first: # we only print a status on form submission
 
     print "<p><strong>{}</strong></p>".format(message)
 
-    if 'org' in d:
-        print '<p>Organization name is:', d.get('org','Guest').upper() + "</p>"
 
-    if 'user' in d:
-        print '<p>Username is:', d.get('user','Guest').capitalize() + "</p>"
+    # if 'user' in d['andrej']:
+    print '<p>Username is:', d.keys()[0].capitalize() + "</p>"
 
     save_data(d)
-    print read_data()
   
 print """
     </body>
