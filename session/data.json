@@ -1,1 +1,8 @@
-{"andrej": {"note": "dong", "choice": "dong"}}
+{
+    "andrej": {
+        "score": [
+            0, 
+            1
+        ]
+    }
+}

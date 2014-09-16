@@ -4,44 +4,48 @@
 import os
 import sys
 import random
-from random import randrange
 import cgitb
 import json
 cgitb.enable()
 
-def rand(array):
-    a = array[:]
-    for i in xrange(len(a) - 1):
-        j = random.randint(i + 1, len(a) - 1)
-        a[i], a[j] = a[j], a[i]
-    return a
-
 
 def web_input():
-    c = os.getenv("CONTENT_LENGTH")
-    if c:
-        data = sys.stdin.read(int(c))
-        d = {}
-        jd = {}
-
+    w = {}
+    cl = os.getenv("CONTENT_LENGTH")
+    if cl:
+        data = sys.stdin.read(int(cl))
         for kv in data.split('&'):
             k, v = kv.split('=')
-            if k == 'user':
-                uv = v
-            else:
-                d[k] = v
-            # {'andrej': ['note': '', 'choice': '', 'score': ['correct': n, 'incorrect': n]]}
-            # 'score' will be added outside of this function
-        jd[uv] = d
-        return jd
-        # return (jd, uv)
-    else:
-        return {}
+            w[k] = v
+    return w
+
+
+# check to see if there is a file
+# load json into a var
+# check file for first key name
+# set this name to the 'u' var
+
+# if no file exists we start from scratch, which happens after first submit of name, and answer
+# set 'u' to d['user']
+# use format_json to generate and return json structure
+
+# this function : {'username': {'score': ['correct n', 'incorrect n']}}
+def format_json(session):
+    j = {}
+    if session:
+        u = session.keys()[0]
+    elif 'user' in w:
+        u = w['user']
+
+    j[u] = {'score': [0, 0]} # this is probably overwritting the incrementor
+
+    return j
+
 
 
 def save_data(data):
     with open('session/data.json', 'wb') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent = 4, sort_keys = True)
 
 
 def read_data():
@@ -51,13 +55,11 @@ def read_data():
 
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
-d = web_input()
-# need to get tuple back from web_input() and assign to d and u (u = current user)
-# d = du[0]
-# u = du[1]
-first = not d  # POST calls should have some input vars so must be GET
-choice_made = bool(d['andrej'].get('choice'))  # 'choice' will be missing if no radio button was pressed
-wrong = choice_made and d['andrej']['note'] != d['andrej']['choice']  # test user selection against stored correct answer
+w = web_input()
+first = not w  # POST calls should have some input vars so must be GET
+choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
+wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
+j = {} # this is the dict --> json for file save 
 
 print "Content-Type: text/html"
 print
@@ -83,14 +85,14 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 # print read_data()
-print d
+# print w
 
 if wrong:
-    note = d['andrej']['note']
+    note = w['note']
 else:
     temp_notes = list(notes)
     if not first:
-        temp_notes.remove(d['andrej']['note'])
+        temp_notes.remove(w['note'])
     note = random.choice(temp_notes)
 
 #  audio player
@@ -111,7 +113,6 @@ print"""
   <input type="hidden" name="note" value="{0}"><br><br>
   """.format(note)
 
-# notes = rand(notes) # maybe later, changes the order of inputs so you don't get used to an answer pattern
 for n in notes:
     print """<label for="{0}">{1}</label>
     <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
@@ -121,22 +122,44 @@ print """<br><input type="submit" value='Submit Answer'>
 
 print "</div>"
 
-if not first: # we only print a status on form submission
+sd = read_data()
+j = format_json(sd)
+u = j.keys()[0]
+
+if first:
+
+    # check to see if there is a first key in the json file, which represents the user
+    # if 'user' in sd:
+    #     print "Hello {}, would you like to continue from your last session?".format(sd['user'])
+    #     j[sd['user']] = []
+    # else:
+    #     print "Start new game"
+
+    print j
+    
+else:  # we only print a status on form submission
     if not choice_made:
         message = "Please select an answer"
     elif wrong:
         message = "Incorrect, try again"
+        #print "incorrect: ", j[u]['score'][1]
+        j[u]['score'][1] = int(j[u]['score'][1]) + 1
     else:
         message = "Correct"
+        #print "correct: ", j[u]['score'][0]
+        j[u]['score'][0] = int(j[u]['score'][0]) + 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
+    if 'user' in w:
+        print '<p>Username is:', w['user'].capitalize() + "</p>"
 
-    # if 'user' in d['andrej']:
-    print '<p>Username is:', d.keys()[0].capitalize() + "</p>"
+    print "j: ", j
+    print "correct: ", j[u]['score'][0]
+    print "incorrect: ", j[u]['score'][1]
+    save_data(j)
 
-    save_data(d)
-  
+
 print """
     </body>
 </html>
