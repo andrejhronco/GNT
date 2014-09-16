@@ -53,9 +53,13 @@ def save_data(data):
 
 
 def read_data():
-    with open('session/data.json') as f:
-        session = json.load(f)
-        return session
+    try:
+        with open('session/data.json') as f:
+            session = json.load(f)
+            return session
+    except IOError:
+        print "no session file exists"
+        return False
 
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
@@ -65,7 +69,8 @@ choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio butt
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
 sd = read_data()
 j = format_json(sd)
-u = j.keys()[0]
+u = j.keys()[0] or "guest"
+
 print "Content-Type: text/html"
 print
 print """<!DOCTYPE html>
@@ -90,7 +95,7 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 # print read_data()
-# print w
+# print session
 
 if wrong:
     note = w['note']
