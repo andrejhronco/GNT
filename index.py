@@ -32,12 +32,16 @@ def web_input():
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
 def format_json(session):
     j = {}
+    correct = 0
+    incorrect = 0
     if session:
         u = session.keys()[0]
+        correct = session[u]['score'][0]
+        incorrect = session[u]['score'][1]
     elif 'user' in w:
         u = w['user']
 
-    j[u] = {'score': [0, 0]} # this is probably overwritting the incrementor
+    j[u] = {'score': [correct, incorrect]}
 
     return j
 
@@ -59,8 +63,9 @@ w = web_input()
 first = not w  # POST calls should have some input vars so must be GET
 choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
-j = {} # this is the dict --> json for file save 
-
+sd = read_data()
+j = format_json(sd)
+u = j.keys()[0]
 print "Content-Type: text/html"
 print
 print """<!DOCTYPE html>
@@ -122,10 +127,6 @@ print """<br><input type="submit" value='Submit Answer'>
 
 print "</div>"
 
-sd = read_data()
-j = format_json(sd)
-u = j.keys()[0]
-
 if first:
 
     # check to see if there is a first key in the json file, which represents the user
@@ -142,12 +143,10 @@ else:  # we only print a status on form submission
         message = "Please select an answer"
     elif wrong:
         message = "Incorrect, try again"
-        #print "incorrect: ", j[u]['score'][1]
-        j[u]['score'][1] = int(j[u]['score'][1]) + 1
+        j[u]['score'][1] += 1
     else:
         message = "Correct"
-        #print "correct: ", j[u]['score'][0]
-        j[u]['score'][0] = int(j[u]['score'][0]) + 1
+        j[u]['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
