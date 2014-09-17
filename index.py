@@ -118,9 +118,14 @@ print"""
 <h3>Select which note just played and click the submit button.</h3>
 
 <form action="" method="POST">
-  <label for="user">User</label>
-  <input type="text" name="user" value="">
-  <input type="hidden" name="note" value="{0}"><br><br>
+  <!-- wrap this in a conditional to only show if: 1. you're not logged in, 2. you are a new user, 3. this is a new game -->
+      <label for="user">User</label>
+      <input type="text" name="user" value="">
+      <label for="user">Password</label>
+      <input type="password" name="pass" value="">
+  <!-- end wrap this in a conditional... -->
+  <input type="hidden" name="note" value="{0}">
+  <br><br>
   """.format(note)
 
 for n in notes:
