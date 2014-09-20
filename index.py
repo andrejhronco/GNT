@@ -46,7 +46,6 @@ def format_json(session):
     return j
 
 
-
 def save_data(data):
     with open('session/data.json', 'wb') as f:
         json.dump(data, f, indent = 4, sort_keys = True)
@@ -69,7 +68,8 @@ choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio butt
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
 sd = read_data()
 j = format_json(sd)
-u = j.keys()[0] or "guest"
+u = j.keys()[0]
+guest = bool(j.keys()[0] == 'guest' or ('user' in w and w['user'] == 'guest'))
 
 print "Content-Type: text/html"
 print
@@ -107,26 +107,33 @@ else:
 
 #  audio player
 print """
-<audio src="audio/{0}.mp3" autoplay controls loop> # autoplay - removed for now for silence...hah
-  <source src="audio/{0}.mp3" type="audio/mp3">
-  <source src="audio/{0}.ogg" type="audio/ogg">
+<audio src="audio/{1}.mp3" {0} controls loop>
+  <source src="audio/{1}.mp3" type="audio/mp3">
+  <source src="audio/{1}.ogg" type="audio/ogg">
   <p>Your browser does not support the audio element.</p>
-</audio>""".format(note)
+</audio>""".format('autoplay' if 'user' in w or u else "", note)
+
+
+if not guest and j:
+    print "<br><br>Correct: {}".format(j[u]['score'][0]) + " / " + "Incorrect: {}".format(j[u]['score'][1])
+
 
 #  form
-print"""
-<h3>Select which note just played and click the submit button.</h3>
+print """<form action="" method="POST">"""
 
-<form action="" method="POST">
-  <!-- wrap this in a conditional to only show if: 1. you're not logged in, 2. you are a new user, 3. this is a new game -->
-      <label for="user">User</label>
-      <input type="text" name="user" value="">
-      <label for="user">Password</label>
-      <input type="password" name="pass" value="">
-  <!-- end wrap this in a conditional... -->
-  <input type="hidden" name="note" value="{0}">
-  <br><br>
-  """.format(note)
+if first:
+    print """
+    <h4>Sign in or play as guest (user: guest / password: guest)</h4>
+    <label for="user">User</label>
+    <input type="text" name="user" value="">
+    <label for="user">Password</label>
+    <input type="password" name="pass" value="">
+    <br><br>"""
+
+else:
+    print"""<h4>Select which note just played and click the submit button.</h4>"""
+
+print"""<input type="hidden" name="note" value="{0}">""".format(note)
 
 for n in notes:
     print """<label for="{0}">{1}</label>
@@ -139,24 +146,19 @@ print "</div>"
 
 if first:
 
-    # check to see if there is a first key in the json file, which represents the user
-    # if 'user' in sd:
-    #     print "Hello {}, would you like to continue from your last session?".format(sd['user'])
-    #     j[sd['user']] = []
-    # else:
-    #     print "Start new game"
-
-    print j
+    print "j: ", j
     
 else:  # we only print a status on form submission
     if not choice_made:
         message = "Please select an answer"
     elif wrong:
         message = "Incorrect, try again"
-        j[u]['score'][1] += 1
+        if not guest:
+            j[u]['score'][1] += 1
     else:
         message = "Correct"
-        j[u]['score'][0] += 1
+        if not guest:
+            j[u]['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
@@ -164,9 +166,12 @@ else:  # we only print a status on form submission
         print '<p>Username is:', w['user'].capitalize() + "</p>"
 
     print "j: ", j
-    print "correct: ", j[u]['score'][0]
-    print "incorrect: ", j[u]['score'][1]
-    save_data(j)
+    print "<br>w: ", w
+    print "<br>is guest: ", guest
+    print "<br>correct: ", j[u]['score'][0]
+    print "<br>incorrect: ", j[u]['score'][1]
+    if not guest:
+        save_data(j)
 
 
 print """
