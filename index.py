@@ -20,16 +20,17 @@ def web_input():
     return w
 
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
+
 def format_json(session):
     j = {}
     correct = 0
     incorrect = 0
-    if session:
-        u = session.keys()[0]
+    if 'user' in w:
+        u = w['user'].lower()
+    elif session:
+        u = session.keys()[0].lower()
         correct = session[u]['score'][0]
         incorrect = session[u]['score'][1]
-    elif 'user' in w:
-        u = w['user']
 
     j[u] = {'score': [correct, incorrect]}
 
@@ -37,7 +38,7 @@ def format_json(session):
 
 
 def save_data(data):
-    with open('session/data.json', 'wb') as f:
+    with open('session/data.json', 'a') as f:
         json.dump(data, f, indent = 4, sort_keys = True)
 
 
@@ -84,8 +85,6 @@ print """<!DOCTYPE html>
 """
 
 print "<div id='container'>"
-# print read_data()
-# print session
 
 if wrong:
     note = w['note']
@@ -117,7 +116,7 @@ if first:
     <label for="user">User</label>
     <input type="text" name="user" value="">
     <br><br>"""
-
+# on login, compare the user name to what is stored in json; if guest, set as guest and no score keeping, if other set to name and create new json block in session
 else:
     print"""<h4>Select which note just played and click the submit button.</h4>"""
 
