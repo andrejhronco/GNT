@@ -19,16 +19,6 @@ def web_input():
             w[k] = v
     return w
 
-
-# check to see if there is a file
-# load json into a var
-# check file for first key name
-# set this name to the 'u' var
-
-# if no file exists we start from scratch, which happens after first submit of name, and answer
-# set 'u' to d['user']
-# use format_json to generate and return json structure
-
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
 def format_json(session):
     j = {}
@@ -51,7 +41,7 @@ def save_data(data):
         json.dump(data, f, indent = 4, sort_keys = True)
 
 
-def read_data():
+def read_data(): # need help with how to handle if there isn't a file
     try:
         with open('session/data.json') as f:
             session = json.load(f)
@@ -66,9 +56,9 @@ w = web_input()
 first = not w  # POST calls should have some input vars so must be GET
 choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
-sd = read_data()
-j = format_json(sd)
-u = j.keys()[0]
+sd = read_data() # returns data form json file
+j = format_json(sd) 
+u = j.keys()[0] # user name from json, first key
 guest = bool(j.keys()[0] == 'guest' or ('user' in w and w['user'] == 'guest'))
 
 print "Content-Type: text/html"
@@ -111,10 +101,10 @@ print """
   <source src="audio/{1}.mp3" type="audio/mp3">
   <source src="audio/{1}.ogg" type="audio/ogg">
   <p>Your browser does not support the audio element.</p>
-</audio>""".format('autoplay' if 'user' in w or u else "", note)
+</audio>""".format("" if first else "autoplay", note)
 
 
-if not guest and j:
+if not first and not guest:
     print "<br><br>Correct: {}".format(j[u]['score'][0]) + " / " + "Incorrect: {}".format(j[u]['score'][1])
 
 
@@ -123,11 +113,9 @@ print """<form action="" method="POST">"""
 
 if first:
     print """
-    <h4>Sign in or play as guest (user: guest / password: guest)</h4>
+    <h4>Sign in or play as guest</h4>
     <label for="user">User</label>
     <input type="text" name="user" value="">
-    <label for="user">Password</label>
-    <input type="password" name="pass" value="">
     <br><br>"""
 
 else:
@@ -139,14 +127,15 @@ for n in notes:
     print """<label for="{0}">{1}</label>
     <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
 
-print """<br><input type="submit" value='Submit Answer'>
-</form>""".format(note)
+print """<br><input type="submit" value='{}'>
+</form>""".format("Sign In" if first else "Submit Answer")
 
 print "</div>"
 
 if first:
 
-    print "j: ", j
+    print "sd: ", sd
+    print "<br>j: ", j
     
 else:  # we only print a status on form submission
     if not choice_made:
