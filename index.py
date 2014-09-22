@@ -22,7 +22,7 @@ def web_input():
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
 
 def format_json(session):
-    j = {}
+    j = {} 
     correct = 0
     incorrect = 0
     if 'user' in w:
