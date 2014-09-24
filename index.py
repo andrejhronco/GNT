@@ -20,6 +20,12 @@ def web_input():
     return w
 
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
+# check if session/data.json file exists via os
+# if it does exist return it
+# loop through and return all top level keys in session into a list
+# compare web_input ['user'] to session key[0:]
+# if w['user'] == session 'user' then set score list to current stored values
+# save file on answer submission
 
 def format_json(session):
     j = {} 
