@@ -20,21 +20,37 @@ def web_input():
     return w
 
 # this function : {'username': {'score': ['correct n', 'incorrect n']}}
+# check if session/data.json file exists via os
+# if it does exist return it
+# loop through and return all top level keys in session into a list
+# compare web_input ['user'] to session key[0:]
+# if w['user'] == session 'user' then set score list to current stored values
+# save file on answer submission
 
 def format_json(session):
     j = {} 
     correct = 0
     incorrect = 0
-    if 'user' in w:
-        u = w['user'].lower()
-    elif session:
+    if not session:
         u = session.keys()[0].lower()
         correct = session[u]['score'][0]
         incorrect = session[u]['score'][1]
+        j[u] = {'score': [correct, incorrect]}
+        return j
 
-    j[u] = {'score': [correct, incorrect]}
+    #if 'user' in w:
+        #if session.keys()[0].lower() == w['user'].lower():
+            #return session
+        # u = w['user'].lower()
+    elif session:
+        return session
+        #u = session.keys()[0].lower()
+        #correct = session[u]['score'][0]
+        #incorrect = session[u]['score'][1]
 
-    return j
+    #j[u] = {'score': [correct, incorrect]}
+
+    
 
 
 def save_data(data):
@@ -50,6 +66,12 @@ def read_data(): # need help with how to handle if there isn't a file
     except IOError:
         print "no session file exists"
         return False
+    # else:
+    #     u = session.keys()[0].lower()
+    #     correct = session[u]['score'][0]
+    #     incorrect = session[u]['score'][1]
+    #     j[u] = {'score': [correct, incorrect]}
+    #     return j
 
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
