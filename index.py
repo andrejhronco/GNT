@@ -19,32 +19,18 @@ def web_input():
             w[k] = v
     return w
 
-# this function : {'username': {'score': ['correct n', 'incorrect n']}}
-# check if session/data.json file exists via os
-# if it does exist return it
-# loop through and return all top level keys in session into a list
-# compare web_input ['user'] to session key[0:]
-# if w['user'] == session 'user' then set score list to current stored values
-# save file on answer submission
 
-def format_json(session):
-    j = {} 
-    correct = 0
-    incorrect = 0
-    if 'user' in w:
-        u = w['user'].lower()
-    elif session:
-        u = session.keys()[0].lower()
-        correct = session[u]['score'][0]
-        incorrect = session[u]['score'][1]
-
-    j[u] = {'score': [correct, incorrect]}
-
-    return j
+def get_user(user):
+    if user in sd:
+        return { user : sd[user] }
+    else:
+        return { user : { 'score' : [0,0] }}
+    # we can return username here and set it to a hidden field below 
+    # we can get the username from sd each time
 
 
 def save_data(data):
-    with open('session/data.json', 'a') as f:
+    with open('session/data.json', 'w') as f:
         json.dump(data, f, indent = 4, sort_keys = True)
 
 
@@ -64,9 +50,13 @@ first = not w  # POST calls should have some input vars so must be GET
 choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
 sd = read_data() # returns data form json file
-j = format_json(sd) 
-u = j.keys()[0] # user name from json, first key
-guest = bool(j.keys()[0] == 'guest' or ('user' in w and w['user'] == 'guest'))
+guest = bool('user' in w and w['user'] == '')
+if 'user' in w and not guest:
+    user = get_user(w['user'])
+else:
+    user = {}
+# u = user.keys()[0] # user name from json, first key
+
 
 print "Content-Type: text/html"
 print
@@ -92,6 +82,9 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 
+# print "w user: " + w['user']
+# print fake['andrej']
+
 if wrong:
     note = w['note']
 else:
@@ -101,16 +94,17 @@ else:
     note = random.choice(temp_notes)
 
 #  audio player
+# <audio src="audio/{1}.mp3" {0} controls loop>
 print """
-<audio src="audio/{1}.mp3" {0} controls loop>
+<audio src="audio/{1}.mp3" controls>
   <source src="audio/{1}.mp3" type="audio/mp3">
   <source src="audio/{1}.ogg" type="audio/ogg">
   <p>Your browser does not support the audio element.</p>
 </audio>""".format("" if first else "autoplay", note)
 
 
-if not first and not guest:
-    print "<br><br>Correct: {}".format(j[u]['score'][0]) + " / " + "Incorrect: {}".format(j[u]['score'][1])
+# if not first and not guest:
+    # print "<br><br>Correct: {}".format(user[u]['score'][0]) + " / " + "Incorrect: {}".format(user[u]['score'][1])
 
 
 #  form
@@ -124,6 +118,7 @@ if first:
     <br><br>"""
 # on login, compare the user name to what is stored in json; if guest, set as guest and no score keeping, if other set to name and create new json block in session
 else:
+    # print"""<input type="hidden" name="user" value="{0}">""".format(user)  
     print"""<h4>Select which note just played and click the submit button.</h4>"""
 
 print"""<input type="hidden" name="note" value="{0}">""".format(note)
@@ -138,9 +133,8 @@ print """<br><input type="submit" value='{}'>
 print "</div>"
 
 if first:
-
     print "sd: ", sd
-    print "<br>j: ", j
+    print "<br>user: ", user
     
 else:  # we only print a status on form submission
     if not choice_made:
@@ -148,24 +142,24 @@ else:  # we only print a status on form submission
     elif wrong:
         message = "Incorrect, try again"
         if not guest:
-            j[u]['score'][1] += 1
+            user['score'][1] += 1
     else:
         message = "Correct"
         if not guest:
-            j[u]['score'][0] += 1
+            user['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
     if 'user' in w:
         print '<p>Username is:', w['user'].capitalize() + "</p>"
 
-    print "j: ", j
+    print "<br>user: ", user
     print "<br>w: ", w
     print "<br>is guest: ", guest
-    print "<br>correct: ", j[u]['score'][0]
-    print "<br>incorrect: ", j[u]['score'][1]
+    # print "<br>correct: ", user[u]['score'][0]
+    # print "<br>incorrect: ", user[u]['score'][1]
     if not guest:
-        save_data(j)
+        save_data(user)
 
 
 print """
