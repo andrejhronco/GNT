@@ -28,12 +28,6 @@ def get_user(user):
     # we can return username here and set it to a hidden field below 
     # we can get the username from sd each time
 
-
-def save_data(data):
-    with open('session/data.json', 'w') as f:
-        json.dump(data, f, indent = 4, sort_keys = True)
-
-
 def read_data(): # need help with how to handle if there isn't a file
     try:
         with open('session/data.json') as f:
@@ -42,6 +36,11 @@ def read_data(): # need help with how to handle if there isn't a file
     except IOError:
         print "no session file exists"
         return False
+
+
+def save_data(data):
+    with open('session/data.json', 'w') as f:
+        json.dump(data, f, indent = 4, sort_keys = True)
 
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
@@ -118,7 +117,7 @@ if first:
     <br><br>"""
 # on login, compare the user name to what is stored in json; if guest, set as guest and no score keeping, if other set to name and create new json block in session
 else:
-    # print"""<input type="hidden" name="user" value="{0}">""".format(user)  
+    print"""<input type="hidden" name="user" value="{0}">""".format(user.keys()[0])  
     print"""<h4>Select which note just played and click the submit button.</h4>"""
 
 print"""<input type="hidden" name="note" value="{0}">""".format(note)
@@ -142,11 +141,11 @@ else:  # we only print a status on form submission
     elif wrong:
         message = "Incorrect, try again"
         if not guest:
-            user['score'][1] += 1
+            user[user.keys()[0]]['score'][1] += 1
     else:
         message = "Correct"
         if not guest:
-            user['score'][0] += 1
+            user[user.keys()[0]]['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
@@ -154,6 +153,7 @@ else:  # we only print a status on form submission
         print '<p>Username is:', w['user'].capitalize() + "</p>"
 
     print "<br>user: ", user
+    print "<br>user score: ", user[user.keys()[0]]['score']
     print "<br>w: ", w
     print "<br>is guest: ", guest
     # print "<br>correct: ", user[u]['score'][0]
