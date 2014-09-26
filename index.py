@@ -49,6 +49,7 @@ choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio butt
 wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
 sd = read_data() # returns data form json file
 guest = bool('user' in w and w['user'] == '')
+
 if 'user' in w and not guest:
     user = get_user(w['user'])
     u = user.keys()[0] # user name from json, first key
@@ -123,7 +124,7 @@ print """<br><input type="submit" value='{}'>
 print "</div>"
 
 if first:
-    pass
+    pass # might want to do something here
     
 else:  # we only print a status on form submission
     if not choice_made:
@@ -139,8 +140,8 @@ else:  # we only print a status on form submission
 
     print "<p><strong>{}</strong></p>".format(message)
 
-    if 'user' in w:
-        print '<p>Username is:', w['user'].capitalize() + "</p>"
+    if 'user' in w and not guest:
+        print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
 
     # print "<br>user: ", user
     # print "<br>user score: ", user[user.keys()[0]]['score']
