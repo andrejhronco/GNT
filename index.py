@@ -25,8 +25,7 @@ def get_user(user):
         return { user : sd[user] }
     else:
         return { user : { 'score' : [0,0] }}
-    # we can return username here and set it to a hidden field below 
-    # we can get the username from sd each time
+
 
 def read_data(): # need help with how to handle if there isn't a file
     try:
@@ -52,9 +51,10 @@ sd = read_data() # returns data form json file
 guest = bool('user' in w and w['user'] == '')
 if 'user' in w and not guest:
     user = get_user(w['user'])
+    u = user.keys()[0] # user name from json, first key
 else:
     user = {}
-# u = user.keys()[0] # user name from json, first key
+    u = ''
 
 
 print "Content-Type: text/html"
@@ -81,9 +81,6 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 
-# print "w user: " + w['user']
-# print fake['andrej']
-
 if wrong:
     note = w['note']
 else:
@@ -93,17 +90,12 @@ else:
     note = random.choice(temp_notes)
 
 #  audio player
-# <audio src="audio/{1}.mp3" {0} controls loop>
 print """
-<audio src="audio/{1}.mp3" controls>
+<audio src="audio/{1}.mp3" {0} controls>
   <source src="audio/{1}.mp3" type="audio/mp3">
   <source src="audio/{1}.ogg" type="audio/ogg">
   <p>Your browser does not support the audio element.</p>
 </audio>""".format("" if first else "autoplay", note)
-
-
-# if not first and not guest:
-    # print "<br><br>Correct: {}".format(user[u]['score'][0]) + " / " + "Incorrect: {}".format(user[u]['score'][1])
 
 
 #  form
@@ -115,9 +107,8 @@ if first:
     <label for="user">User</label>
     <input type="text" name="user" value="">
     <br><br>"""
-# on login, compare the user name to what is stored in json; if guest, set as guest and no score keeping, if other set to name and create new json block in session
 else:
-    print"""<input type="hidden" name="user" value="{0}">""".format(user.keys()[0])  
+    print"""<input type="hidden" name="user" value="{0}">""".format(u)  
     print"""<h4>Select which note just played and click the submit button.</h4>"""
 
 print"""<input type="hidden" name="note" value="{0}">""".format(note)
@@ -132,8 +123,7 @@ print """<br><input type="submit" value='{}'>
 print "</div>"
 
 if first:
-    print "sd: ", sd
-    print "<br>user: ", user
+    pass
     
 else:  # we only print a status on form submission
     if not choice_made:
@@ -141,25 +131,26 @@ else:  # we only print a status on form submission
     elif wrong:
         message = "Incorrect, try again"
         if not guest:
-            user[user.keys()[0]]['score'][1] += 1
+            user[u]['score'][1] += 1
     else:
         message = "Correct"
         if not guest:
-            user[user.keys()[0]]['score'][0] += 1
+            user[u]['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
     if 'user' in w:
         print '<p>Username is:', w['user'].capitalize() + "</p>"
 
-    print "<br>user: ", user
-    print "<br>user score: ", user[user.keys()[0]]['score']
-    print "<br>w: ", w
-    print "<br>is guest: ", guest
+    # print "<br>user: ", user
+    # print "<br>user score: ", user[user.keys()[0]]['score']
+    # print "<br>w: ", w
+    # print "<br>is guest: ", guest
     # print "<br>correct: ", user[u]['score'][0]
     # print "<br>incorrect: ", user[u]['score'][1]
     if not guest:
         save_data(user)
+        print "<p>Correct: {}".format(user[user.keys()[0]]['score'][0]) + " / " + "Incorrect: {}".format(user[user.keys()[0]]['score'][1]) + "</p>"
 
 
 print """
