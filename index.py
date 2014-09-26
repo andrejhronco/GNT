@@ -22,9 +22,9 @@ def web_input():
 
 def get_user(user):
     if user in sd:
-        return { user : sd[user] }
+        return { user.lower() : sd[user] }
     else:
-        return { user : { 'score' : [0,0] }}
+        return { user.lower() : { 'score' : [0,0] }}
 
 
 def read_data(): # need help with how to handle if there isn't a file
@@ -151,7 +151,7 @@ else:  # we only print a status on form submission
     # print "<br>incorrect: ", user[u]['score'][1]
     if not guest:
         save_data(user)
-        print "<p>Correct: {}".format(user[user.keys()[0]]['score'][0]) + " / " + "Incorrect: {}".format(user[user.keys()[0]]['score'][1]) + "</p>"
+        print "<p>Correct: {}".format(user[u]['score'][0]) + " / " + "Incorrect: {}".format(user[u]['score'][1]) + "</p>"
 
 
 print """
