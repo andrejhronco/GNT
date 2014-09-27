@@ -36,8 +36,25 @@ def read_data(): # need help with how to handle if there isn't a file
         print "no session file exists"
         return False
 
+fake_data = {
+    'andrej' : { 'score' : [ 9, 5 ] },
+    'david'  : { 'score' : [ 6, 8 ] },
+    'dewa'   : { 'score' : [ 9999999999, 0 ] },
+}
 
-def save_data(data):
+fake_user = {'david' : { 'score' : [ 9, 6 ] }}
+
+# merge fake_user in fake_data
+# fake_data[fake_user.keys()[0]] = fake_user.values()[0]
+
+def save_data(user, session):
+    # this works but doesn't update the user score display until first answer submit
+    # data = dict(user.items() + session.items()) # creates a dict from the items of user and session
+
+    # this works until you logout and login with the same user where it makes the score 0,0
+    session[user.keys()[0]] = user.values()[0] # adds user data to session
+    data = session
+    
     with open('session/data.json', 'w') as f:
         json.dump(data, f, indent = 4, sort_keys = True)
 
@@ -150,7 +167,8 @@ else:  # we only print a status on form submission
     # print "<br>correct: ", user[u]['score'][0]
     # print "<br>incorrect: ", user[u]['score'][1]
     if not guest:
-        save_data(user)
+        save_data(user, sd)
+        # print user
         print "<p>Correct: {}".format(user[u]['score'][0]) + " / " + "Incorrect: {}".format(user[u]['score'][1]) + "</p>"
 
 
