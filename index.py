@@ -53,6 +53,7 @@ login = not w
 def login_page():
     #  login form
     print """
+    <h3>Test your GSJ note recognition!</h3>
     <h4>Sign in or play as guest</h4>
     <label for="user">Username</label>
     <input type="text" name="user" value=""><br>
@@ -63,7 +64,7 @@ def login_page():
 
 
 def note_test():
-    guest = bool('user' in w and w['user'] == '')
+    guest = bool(('user' in w and (w['user'] == '' or w['user'] == 'guest')))
     first_test = 'note' not in w
     choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
     wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
@@ -73,7 +74,7 @@ def note_test():
         user_name = w['user']
         user_data = get_user(user_name)
     else:
-        user_name = ''
+        user_name = 'guest'
         user_data = {}
 
     #  note generator
@@ -121,11 +122,13 @@ def note_test():
 
     #  username and score
     if 'user' in w and not guest:
-        print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
+        print '<p>Username is:', w['user'].capitalize() + " ( <a href='/index.py'>logout</a> )</p>"
 
     if not guest:
         save_data(user_name, user_data)
         print "<p>Correct: {}".format(user_data['score'][0]) + " / " + "Incorrect: {}".format(user_data['score'][1]) + "</p>"
+    else:
+        print '<a href="/index.py">Sign in as a user</a>'
 
 
 print "Content-Type: text/html"
