@@ -22,9 +22,9 @@ def web_input():
 
 def get_user(user):
     if user in sd:
-        return { user.lower() : sd[user] }
+        return sd[user]
     else:
-        return { user.lower() : { 'score' : [0,0] }}
+        return { 'score' : [0,0] }
 
 
 def read_data(): # need help with how to handle if there isn't a file
@@ -42,19 +42,18 @@ fake_data = {
     'dewa'   : { 'score' : [ 9999999999, 0 ] },
 }
 
-fake_user = {'david' : { 'score' : [ 9, 6 ] }}
+fake_user_name = 'david'
+fake_user_data = { 'score' : [ 6, 10 ] }
+
+fake_data[fake_user_name] = fake_user_data
 
 # merge fake_user in fake_data
 # fake_data[fake_user.keys()[0]] = fake_user.values()[0]
 
-def save_data(user, session):
-    # this works but doesn't update the user score display until first answer submit
-    # data = dict(user.items() + session.items()) # creates a dict from the items of user and session
-
-    # this works until you logout and login with the same user where it makes the score 0,0
-    session[user.keys()[0]] = user.values()[0] # adds user data to session
+def save_data(user_name, user_data, session):
+    session[user_name] = user_data # adds user data to session
     data = session
-    
+
     with open('session/data.json', 'w') as f:
         json.dump(data, f, indent = 4, sort_keys = True)
 
@@ -68,11 +67,11 @@ sd = read_data() # returns data form json file
 guest = bool('user' in w and w['user'] == '')
 
 if 'user' in w and not guest:
-    user = get_user(w['user'])
-    u = user.keys()[0] # user name from json, first key
+    user_name = w['user'].lower()
+    user_data = get_user(user_name)
 else:
-    user = {}
-    u = ''
+    user_name = ''
+    user_data = {}
 
 
 print "Content-Type: text/html"
@@ -126,7 +125,7 @@ if first:
     <input type="text" name="user" value="">
     <br><br>"""
 else:
-    print"""<input type="hidden" name="user" value="{0}">""".format(u)  
+    print"""<input type="hidden" name="user" value="{0}">""".format(user_name)  
     print"""<h4>Select which note just played and click the submit button.</h4>"""
 
 print"""<input type="hidden" name="note" value="{0}">""".format(note)
@@ -149,27 +148,21 @@ else:  # we only print a status on form submission
     elif wrong:
         message = "Incorrect, try again"
         if not guest:
-            user[u]['score'][1] += 1
+            user_data['score'][1] += 1
     else:
         message = "Correct"
         if not guest:
-            user[u]['score'][0] += 1
+           user_data['score'][0] += 1
 
     print "<p><strong>{}</strong></p>".format(message)
 
     if 'user' in w and not guest:
         print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
 
-    # print "<br>user: ", user
-    # print "<br>user score: ", user[user.keys()[0]]['score']
-    # print "<br>w: ", w
-    # print "<br>is guest: ", guest
-    # print "<br>correct: ", user[u]['score'][0]
-    # print "<br>incorrect: ", user[u]['score'][1]
+
     if not guest:
-        save_data(user, sd)
-        # print user
-        print "<p>Correct: {}".format(user[u]['score'][0]) + " / " + "Incorrect: {}".format(user[u]['score'][1]) + "</p>"
+        save_data(user_name, user_data, sd)
+        print "<p>Correct: {}".format(user_data['score'][0]) + " / " + "Incorrect: {}".format(user_data['score'][1]) + "</p>"
 
 
 print """
