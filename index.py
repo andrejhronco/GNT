@@ -9,6 +9,8 @@ import json
 cgitb.enable()
 
 
+notes = ['ding', 'dong', 'deng', 'dung', 'dang']
+
 def web_input():
     w = {}
     cl = os.getenv("CONTENT_LENGTH")
@@ -16,62 +18,108 @@ def web_input():
         data = sys.stdin.read(int(cl))
         for kv in data.split('&'):
             k, v = kv.split('=')
-            w[k] = v
+            w[k] = v.lower()
     return w
 
 
+sd = None
+def read_data():
+    global sd
+    try:
+        with open('session/data.json') as f:
+            sd = json.load(f)
+    except IOError:
+        #print "no session file exists"
+        sd = {}
+
 def get_user(user):
+    if sd == None:
+        read_data()
     if user in sd:
         return sd[user]
     else:
         return { 'score' : [0,0] }
 
-
-def read_data(): # need help with how to handle if there isn't a file
-    try:
-        with open('session/data.json') as f:
-            session = json.load(f)
-            return session
-    except IOError:
-        print "no session file exists"
-        return False
-
-fake_data = {
-    'andrej' : { 'score' : [ 9, 5 ] },
-    'david'  : { 'score' : [ 6, 8 ] },
-    'dewa'   : { 'score' : [ 9999999999, 0 ] },
-}
-
-fake_user_name = 'david'
-fake_user_data = { 'score' : [ 6, 10 ] }
-
-fake_data[fake_user_name] = fake_user_data
-
-# merge fake_user in fake_data
-# fake_data[fake_user.keys()[0]] = fake_user.values()[0]
-
-def save_data(user_name, user_data, session):
-    session[user_name] = user_data # adds user data to session
-    data = session
-
+def save_data(user_name, user_data):
+    sd[user_name] = user_data        # updates user data
     with open('session/data.json', 'w') as f:
-        json.dump(data, f, indent = 4, sort_keys = True)
+        json.dump(sd, f, indent = 4, sort_keys = True)
 
 
-notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 w = web_input()
-first = not w  # POST calls should have some input vars so must be GET
-choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
-wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
-sd = read_data() # returns data form json file
-guest = bool('user' in w and w['user'] == '')
+login = not w  # POST calls should have some input vars so must be GET
 
-if 'user' in w and not guest:
-    user_name = w['user'].lower()
-    user_data = get_user(user_name)
-else:
-    user_name = ''
-    user_data = {}
+def login_page():
+  #  form
+    print """
+    <h4>Sign in or play as guest</h4>
+    <label for="user">Username</label>
+    <input type="text" name="user" value=""><br>
+    <br>
+    <br>
+    <input type="submit" value="Sign In">
+    """
+
+
+def note_test():
+    guest = bool('user' in w and w['user'] == '')
+    first_test = 'note' not in w
+    choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
+    wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
+
+    if 'user' in w and not guest:
+        user_name = w['user']
+        user_data = get_user(user_name)
+    else:
+        user_name = ''
+        user_data = {}
+
+    if wrong:
+        note = w['note']   # same note
+    else:
+        temp_notes = list(notes)
+        if not first_test:
+            temp_notes.remove(w['note'])
+        note = random.choice(temp_notes)
+        
+    print """
+    <audio src="audio/{1}.mp3" {0} controls>
+      <source src="audio/{1}.mp3" type="audio/mp3">
+      <source src="audio/{1}.ogg" type="audio/ogg">
+      <p>Your browser does not support the audio element.</p>
+    </audio><br>""".format("" if login else "autoplay", note)
+
+    #  form
+    if user_name:
+        print """<input type="hidden" name="user" value="{0}">""".format(user_name)
+        print """<h4>Select which note just played and click the submit button.</h4>"""
+    print """<input type="hidden" name="note" value="{0}">""".format(note)
+
+    for n in notes:
+        print """<label for="{0}">{1}</label>
+        <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
+
+    print '<br><input type="submit" value="Submit Answer">\n'
+
+    if not choice_made:
+        message = "Please select an answer"
+    elif wrong:
+        message = "Incorrect, try again"
+        if not guest:
+            user_data['score'][1] += 1
+    else:
+        message = "Correct"
+        if not guest:
+           user_data['score'][0] += 1
+
+    print "<p><strong>{}</strong></p>".format(message)
+
+    if 'user' in w and not guest:
+        print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
+
+    if not guest:
+        save_data(user_name, user_data)
+        print "<p>Correct: {}".format(user_data['score'][0]) + " / " + "Incorrect: {}".format(user_data['score'][1]) + "</p>"
 
 
 print "Content-Type: text/html"
@@ -98,72 +146,16 @@ print """<!DOCTYPE html>
 
 print "<div id='container'>"
 
-if wrong:
-    note = w['note']
+print '<form action="" method="POST">'
+
+if login:
+    login_page()
 else:
-    temp_notes = list(notes)
-    if not first:
-        temp_notes.remove(w['note'])
-    note = random.choice(temp_notes)
-
-#  audio player
-print """
-<audio src="audio/{1}.mp3" {0} controls>
-  <source src="audio/{1}.mp3" type="audio/mp3">
-  <source src="audio/{1}.ogg" type="audio/ogg">
-  <p>Your browser does not support the audio element.</p>
-</audio>""".format("" if first else "autoplay", note)
-
-
-#  form
-print """<form action="" method="POST">"""
-
-if first:
-    print """
-    <h4>Sign in or play as guest</h4>
-    <label for="user">User</label>
-    <input type="text" name="user" value="">
-    <br><br>"""
-else:
-    print"""<input type="hidden" name="user" value="{0}">""".format(user_name)  
-    print"""<h4>Select which note just played and click the submit button.</h4>"""
-
-print"""<input type="hidden" name="note" value="{0}">""".format(note)
-
-for n in notes:
-    print """<label for="{0}">{1}</label>
-    <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
-
-print """<br><input type="submit" value='{}'>
-</form>""".format("Sign In" if first else "Submit Answer")
+    note_test()
+    
+print '</form>'
 
 print "</div>"
-
-if first:
-    pass # might want to do something here
-    
-else:  # we only print a status on form submission
-    if not choice_made:
-        message = "Please select an answer"
-    elif wrong:
-        message = "Incorrect, try again"
-        if not guest:
-            user_data['score'][1] += 1
-    else:
-        message = "Correct"
-        if not guest:
-           user_data['score'][0] += 1
-
-    print "<p><strong>{}</strong></p>".format(message)
-
-    if 'user' in w and not guest:
-        print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
-
-
-    if not guest:
-        save_data(user_name, user_data, sd)
-        print "<p>Correct: {}".format(user_data['score'][0]) + " / " + "Incorrect: {}".format(user_data['score'][1]) + "</p>"
-
 
 print """
     </body>
