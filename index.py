@@ -29,8 +29,8 @@ def read_data():
         with open('session/data.json') as f:
             sd = json.load(f)
     except IOError:
-        #print "no session file exists"
         sd = {}
+
 
 def get_user(user):
     if sd == None:
@@ -40,17 +40,18 @@ def get_user(user):
     else:
         return { 'score' : [0,0] }
 
+
 def save_data(user_name, user_data):
-    sd[user_name] = user_data        # updates user data
+    sd[user_name] = user_data  # updates user data
     with open('session/data.json', 'w') as f:
         json.dump(sd, f, indent = 4, sort_keys = True)
 
 
 w = web_input()
-login = not w  # POST calls should have some input vars so must be GET
+login = not w
 
 def login_page():
-  #  form
+    #  login form
     print """
     <h4>Sign in or play as guest</h4>
     <label for="user">Username</label>
@@ -67,6 +68,7 @@ def note_test():
     choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
     wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
 
+    #  user data
     if 'user' in w and not guest:
         user_name = w['user']
         user_data = get_user(user_name)
@@ -74,14 +76,16 @@ def note_test():
         user_name = ''
         user_data = {}
 
+    #  note generator
     if wrong:
-        note = w['note']   # same note
+        note = w['note']  #  same note
     else:
         temp_notes = list(notes)
         if not first_test:
             temp_notes.remove(w['note'])
         note = random.choice(temp_notes)
         
+    #  audio player
     print """
     <audio src="audio/{1}.mp3" {0} controls>
       <source src="audio/{1}.mp3" type="audio/mp3">
@@ -89,7 +93,7 @@ def note_test():
       <p>Your browser does not support the audio element.</p>
     </audio><br>""".format("" if login else "autoplay", note)
 
-    #  form
+    #  note test form
     if user_name:
         print """<input type="hidden" name="user" value="{0}">""".format(user_name)
         print """<h4>Select which note just played and click the submit button.</h4>"""
@@ -101,6 +105,7 @@ def note_test():
 
     print '<br><input type="submit" value="Submit Answer">\n'
 
+    #  answer logic
     if not choice_made:
         message = "Please select an answer"
     elif wrong:
@@ -114,6 +119,7 @@ def note_test():
 
     print "<p><strong>{}</strong></p>".format(message)
 
+    #  username and score
     if 'user' in w and not guest:
         print '<p>Username is:', w['user'].capitalize() + " <a href='/index.py'>logout</a></p>"
 
