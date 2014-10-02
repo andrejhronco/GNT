@@ -8,16 +8,20 @@ import cgitb
 import json
 cgitb.enable()
 
-# notes = []
-# note_order = []
-# for f in os.listdir("audio"):
-#     if f.endswith('.mp3'):
-#         f = os.path.splitext(f)
-#         n = f[0].split("-")
-#         notes.append(n[1])
-#         note_order.append(n[0])
+notes = []
+# note_orders = []
+note_order = []
+for f in os.listdir("audio"):
+    if f.endswith('.mp3'):
+        f = os.path.splitext(f)
+        n = f[0].split("-")
+        notes.append(n[1])
+        # note_orders.append(n[0])
+        note_order.append(list(n[0]))
+    # oct = note_order[i][0]
+    # pitch = note_order[i][1]
 
-notes = ['ding', 'dong', 'deng', 'dung', 'dang']
+# notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 
 def web_input():
     w = {}
@@ -107,9 +111,9 @@ def note_test():
         print """<h4>Select which note just played and click the submit button.</h4>"""
     print """<input type="hidden" name="note" value="{0}">""".format(note)
 
-    for n in notes:
-        print """<label for="{0}">{1}</label>
-        <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize())
+    for i, n in enumerate(notes):
+        print """<label for="{0}">{1}({2})</label>
+        <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize(), note_order[i][1])
 
     print '<br><input type="submit" value="Submit Answer">\n'
 
@@ -170,7 +174,8 @@ else:
     note_test()
     
 print '</form>'
-
+print note_order
+print notes
 print "</div>"
 
 print """
