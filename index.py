@@ -8,6 +8,14 @@ import cgitb
 import json
 cgitb.enable()
 
+# notes = []
+# note_order = []
+# for f in os.listdir("audio"):
+#     if f.endswith('.mp3'):
+#         f = os.path.splitext(f)
+#         n = f[0].split("-")
+#         notes.append(n[1])
+#         note_order.append(n[0])
 
 notes = ['ding', 'dong', 'deng', 'dung', 'dang']
 
@@ -90,7 +98,6 @@ def note_test():
     print """
     <audio src="audio/{1}.mp3" {0} controls>
       <source src="audio/{1}.mp3" type="audio/mp3">
-      <source src="audio/{1}.ogg" type="audio/ogg">
       <p>Your browser does not support the audio element.</p>
     </audio><br>""".format("" if login else "autoplay", note)
 
