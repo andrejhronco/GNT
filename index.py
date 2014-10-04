@@ -11,7 +11,6 @@ cgitb.enable()
 
 def notes():
     notes = []
-
     for f in os.listdir('audio'):
         if f.endswith('.mp3'):
             f = os.path.splitext(f)
@@ -99,8 +98,9 @@ def note_test():
         
     #  audio player
     print """
-    <audio src="audio/{0}.mp3" {1} controls>
+    <audio {1} controls>
       <source src="audio/{0}.mp3" type="audio/mp3">
+      <source src="audio/{0}.ogg" type="audio/ogg">
       <p>Your browser does not support the audio element.</p>
     </audio><br>""".format(note, "" if login else "autoplay")
 
@@ -110,7 +110,7 @@ def note_test():
         print """<h4>Select which note just played and click the submit button.</h4>"""
     print """<input type="hidden" name="note" value="{0}">""".format(note)
 
-    for i, n in enumerate(notes_list):
+    for n in notes_list:
         print """<label for="{0}">{1}</label>
         <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format('-'.join(n), n[1])
 
