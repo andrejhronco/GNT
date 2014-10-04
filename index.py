@@ -8,20 +8,17 @@ import cgitb
 import json
 cgitb.enable()
 
-notes = []
-# note_orders = []
-note_order = []
-for f in os.listdir("audio"):
-    if f.endswith('.mp3'):
-        f = os.path.splitext(f)
-        n = f[0].split("-")
-        notes.append(n[1])
-        # note_orders.append(n[0])
-        note_order.append(list(n[0]))
-    # oct = note_order[i][0]
-    # pitch = note_order[i][1]
 
-# notes = ['ding', 'dong', 'deng', 'dung', 'dang']
+def notes():
+    notes = []
+
+    for f in os.listdir('audio'):
+        if f.endswith('.mp3'):
+            f = os.path.splitext(f)
+            n = f[0].split('-')
+            notes.append(n)
+    return notes
+
 
 def web_input():
     w = {}
@@ -80,6 +77,7 @@ def note_test():
     first_test = 'note' not in w
     choice_made = bool(w.get('choice'))  # 'choice' will be missing if no radio button was pressed
     wrong = choice_made and w['note'] != w['choice']  # test user selection against stored correct answer
+    notes_list = notes()
 
     #  user data
     if 'user' in w and not guest:
@@ -93,17 +91,18 @@ def note_test():
     if wrong:
         note = w['note']  #  same note
     else:
-        temp_notes = list(notes)
+        temp_notes = list(notes_list)
         if not first_test:
-            temp_notes.remove(w['note'])
+            temp_notes.remove(w['note'].split('-'))
         note = random.choice(temp_notes)
+        note = '-'.join(note)
         
     #  audio player
     print """
-    <audio src="audio/{1}.mp3" {0} controls>
-      <source src="audio/{1}.mp3" type="audio/mp3">
+    <audio src="audio/{0}.mp3" {1} controls>
+      <source src="audio/{0}.mp3" type="audio/mp3">
       <p>Your browser does not support the audio element.</p>
-    </audio><br>""".format("" if login else "autoplay", note)
+    </audio><br>""".format(note, "" if login else "autoplay")
 
     #  note test form
     if user_name:
@@ -111,9 +110,9 @@ def note_test():
         print """<h4>Select which note just played and click the submit button.</h4>"""
     print """<input type="hidden" name="note" value="{0}">""".format(note)
 
-    for i, n in enumerate(notes):
-        print """<label for="{0}">{1}({2})</label>
-        <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format(n, n.capitalize(), note_order[i][1])
+    for i, n in enumerate(notes_list):
+        print """<label for="{0}">{1}</label>
+        <input type="radio" name="choice" id="{0}" value="{0}"><br>""".format('-'.join(n), n[1])
 
     print '<br><input type="submit" value="Submit Answer">\n'
 
@@ -174,8 +173,7 @@ else:
     note_test()
     
 print '</form>'
-print note_order
-print notes
+
 print "</div>"
 
 print """
