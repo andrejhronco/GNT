@@ -16,7 +16,7 @@ def notes():
             f = os.path.splitext(f)
             n = f[0].split('-')
             notes.append(n)
-    return notes
+    return sorted(notes)
 
 
 def web_input():
